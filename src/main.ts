@@ -6,7 +6,6 @@ import helmet from "helmet";
 import { AppModule } from "./app.module";
 import { _Configuration_Keys } from "./config/config.keys";
 
-
 const Config = new ConfigService();
 async function bootstrap() {
 
@@ -18,13 +17,12 @@ async function bootstrap() {
 
     app.use(helmet());
 
-
     app.enableCors({
         origin: function (origin, callback) {
             // allow requests with no origin
             // (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
-            // return true;
+
             if (allowedOrigins.indexOf(origin) === -1) {
                 var msg =
                     "Theeee CORS policy for this site does not " +
