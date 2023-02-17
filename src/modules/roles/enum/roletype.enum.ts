@@ -1,0 +1,14 @@
+export enum RoleType
+{
+  DEFAULT_ROLE = 'DEFAULT_ROLE',
+  ADMIN_ROLE = 'ADMIN_ROLE',
+  ARTIST_ROLE = 'ARTIST_ROLE',
+  CONTRATIST_ROLE = 'CONTRATIST_ROLE',
+}
+
+
+
+
+
+
+
