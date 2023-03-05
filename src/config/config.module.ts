@@ -1,5 +1,6 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from "@nestjs/config";
+
 import { _MONGOOSEMODULE } from "../database/mongo-config";
 import { EnvConfigurations } from "./app.config";
 import { ConfigProjectService } from "./config.service";
@@ -11,7 +12,8 @@ import { ConfigProjectService } from "./config.service";
         ConfigModule.forRoot({
             load: [EnvConfigurations],
         }),
-        _MONGOOSEMODULE
+        _MONGOOSEMODULE,
+
     ],
     providers: [
         {

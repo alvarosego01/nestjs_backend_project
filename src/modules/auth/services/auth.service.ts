@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable, Global } from '@nestjs/common';
 import { JwtService } from "@nestjs/jwt";
 import { InjectModel, InjectConnection } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
@@ -6,7 +6,6 @@ import { DateProcessService, ProcessDataService } from "../../../common/adapters
 import { _response_I } from "../../../common/interfaces";
 import { _argsUpdate } from "../../../common/interfaces/responseUpdate.interface";
 import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
-import { ExeptionsHandlersService } from "../../../common/services";
 import { RolesService } from "../../roles/services/roles.service";
 import { Users } from "../../users/schemas";
 import { JwtPayload_I, session_I } from "../interfaces";
@@ -16,19 +15,19 @@ import { LoginUserDto } from "../dto/login-user.dto";
 import { CreateUserDto } from "../../users/dto/create-user.dto";
 
 import * as bcrypt from "bcrypt";
-
+import { ProfileUser } from "../../users/schemas/profile.schema";
 
 @Injectable()
 export class AuthService {
 
     constructor(
         @InjectModel(Users.name) private UsersModel: Model<Users>,
+        @InjectModel(ProfileUser.name) private ProfileUserModel: Model<ProfileUser>,
         private readonly _jwtService: JwtService,
         private readonly _dateProcessService: DateProcessService,
         private readonly _processData: ProcessDataService,
         private readonly _roleService: RolesService,
-        private readonly _exeptionsHandlersService: ExeptionsHandlersService,
-        @InjectConnection() public connection: mongoose.Connection
+        @InjectConnection() public connection: mongoose.Connection,
     ) {
 
     }
@@ -39,8 +38,6 @@ export class AuthService {
             pass,
             rol
         } = CreateUserDto;
-
-        // console.log('llega aaqui');
 
         const user = new this.UsersModel(CreateUserDto);
 
@@ -60,9 +57,27 @@ export class AuthService {
 
         }).catch((err: _response_I) => {
 
-            console.log('regresa error aqui', err);
             _Response = err;
-            return this._exeptionsHandlersService.exceptionEmitHandler(err);
+
+        });
+
+        let profile = new this.ProfileUserModel({
+            user: user._id
+        });
+
+        user.profile = String(profile._id);
+
+        await this._processData._saveDB(profile, transactionSession).then(async (r: _response_I) => {
+
+        }, async (err: _response_I) => {
+
+            _Response = err;
+            _Response.message = [
+                {
+                    message: 'No se pudo crear el perfil de usuario',
+                    type: 'global'
+                }
+            ];
 
         });
 
@@ -77,12 +92,15 @@ export class AuthService {
             ]
 
         }, (err: _response_I) => {
-
             _Response = err;
+              _Response.message = [
+                {
+                    message: `No se pudo registrar el usuario`,
+                    type: 'global'
+                }
+            ]
 
-            return this._exeptionsHandlersService.exceptionEmitHandler(err);
-
-        })
+        });
 
         if (_Response.ok == true) {
 
@@ -91,12 +109,18 @@ export class AuthService {
 
         } else {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(_Response);
+            await transactionSession.endSession();
+
+            throw new HttpException({
+               status: _Response.statusCode,
+               error: _Response.message,
+             }, _Response.statusCode, {
+               cause: _Response.err
+             });
 
         }
 
         return _Response
-
 
     }
 
@@ -116,10 +140,10 @@ export class AuthService {
                     select: 'rol alias',
                     model: 'Roles', // <- si es un array de ids se debe especificar el model
                 },
-                // {
-                //     path: 'profile',
-                //     model: 'ProfileUser', // <- si es un array de ids se debe especificar el model
-                // }
+                {
+                    path: 'profile',
+                    model: 'ProfileUser', // <- si es un array de ids se debe especificar el model
+                }
             ]
         }
 
@@ -138,7 +162,8 @@ export class AuthService {
                         }
                     ]
                 };
-                this._exeptionsHandlersService.exceptionEmitHandler(_Response);
+                throw new HttpException(_Response, _Response.statusCode);
+
             }
 
             if (!bcrypt.compareSync(pass, r.data.pass)) {
@@ -154,7 +179,7 @@ export class AuthService {
                     ]
                 };
 
-                this._exeptionsHandlersService.exceptionEmitHandler(_Response);
+                throw new HttpException(_Response, _Response.statusCode);
 
             } else {
 
@@ -186,32 +211,22 @@ export class AuthService {
                     }
                 ]
 
-
                 await this.updateLastSession(r.data._id).then(r => { }, e => { });
-
-                // let x = {
-                //   _idUser: l._id,
-                //   name: l.name,
-                //   last_name: l.last_name,
-                //   rol: l.rol
-                // }
-                // await this._visitGateway.anunciarLogin(x);
 
             }
 
         }, (err: _response_I) => {
 
-            _Response = err;
 
             if (err.statusCode != 500) {
-                _Response.message = [
+                err.message = [
                     {
                         message: 'Usuario o contraseña inválidos',
                         type: 'global'
                     }
                 ]
             } else {
-                _Response.message = [
+                err.message = [
                     {
                         message: 'Algo ha salido mal, intente más tarde',
                         type: 'global'
@@ -219,10 +234,9 @@ export class AuthService {
                 ]
             }
 
-            this._exeptionsHandlersService.exceptionEmitHandler(_Response);
+            throw new HttpException(err, err.statusCode);
 
         })
-
 
         return _Response;
 
@@ -253,8 +267,8 @@ export class AuthService {
                 resolve(true);
             }, (err: _response_I) => {
                 reject(false);
+                throw new HttpException(err, err.statusCode);
 
-                this._exeptionsHandlersService.exceptionEmitHandler(err);
             });
 
         });

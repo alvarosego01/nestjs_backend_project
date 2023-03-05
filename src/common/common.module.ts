@@ -22,18 +22,19 @@ import { SocketsService } from './sockets/sockets.service';
         CommonService,
         ProcessDataService,
         DateProcessService,
-        ExeptionsHandlersService,
 
         SocketsGateway,
-        SocketsService
+        SocketsService,
+
+        ExeptionsHandlersService
 
     ],
     exports: [
         CommonService,
         ProcessDataService,
         DateProcessService,
-        ExeptionsHandlersService,
-        SocketsService
+        SocketsService,
+        ExeptionsHandlersService
     ]
 })
 export class CommonModule { }

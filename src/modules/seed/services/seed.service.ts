@@ -1,14 +1,10 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
+import { Injectable, HttpException } from "@nestjs/common";
 import { _response_I } from "../../../common/interfaces";
-import { ExeptionsHandlersService } from "../../../common/services";
 import { AuthService } from "../../auth/services/auth.service";
-import { Roles } from "../../roles/schemas";
 import { RolesService } from "../../roles/services/roles.service";
-import { Users } from "../../users/schemas";
 import { UsersService } from "../../users/services";
 import { seed_initialData, SeedRole_I, seedUser_I } from "../data/seed-data";
+
 
 
 
@@ -16,9 +12,8 @@ import { seed_initialData, SeedRole_I, seedUser_I } from "../data/seed-data";
 export class SeedService {
 
     constructor(
-        @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
-        @InjectModel(Roles.name) private readonly RolesModel: Model<Roles>,
-        private readonly _exeptionsHandlersService: ExeptionsHandlersService,
+        // @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
+        // @InjectModel(Roles.name) private readonly RolesModel: Model<Roles>,
         private readonly _userServices: UsersService,
         private readonly _rolesService: RolesService,
         private readonly _authService: AuthService
@@ -51,7 +46,7 @@ export class SeedService {
         _Response.message = msg;
 
         if (_Response.ok === false) {
-            this._exeptionsHandlersService.exceptionEmitHandler(_Response);
+            throw new HttpException(_Response, _Response.statusCode);
         }
 
         return _Response;
@@ -141,8 +136,6 @@ export class SeedService {
     private setUsersSeed(usersData: seedUser_I[]): Promise<any> {
 
         return new Promise(async (resolve, reject) => {
-
-
 
             const Users = await this._userServices.findAll().then((r: _response_I) => {
 

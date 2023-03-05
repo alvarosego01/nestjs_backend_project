@@ -54,7 +54,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
             throw new UnauthorizedException();
 
-            // this._exeptionsHandlersService.exceptionEmitHandler(err);
 
         });
 

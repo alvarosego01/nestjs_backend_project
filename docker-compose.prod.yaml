@@ -66,6 +66,6 @@ services:
     ports:
       - 27017:27017
     environment:
-      MONGODB_DATABASE: wam-db
+      MONGODB_DATABASE: wam_db
     volumes:
       - ./mongo:/data/db

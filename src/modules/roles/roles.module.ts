@@ -4,7 +4,7 @@ import { RolesController } from './controllers/roles.controller';
 import { CommonModule } from '../../common/common.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Roles, RolesSchema } from './schemas';
-import { AuthModule } from '../auth/auth.module';
+
 
 export const _ROLESSCHEMA = MongooseModule.forFeature([
     {

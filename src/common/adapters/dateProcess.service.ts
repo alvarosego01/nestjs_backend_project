@@ -9,9 +9,9 @@ export class DateProcessService {
     constructor() { }
 
     setDate() {
+
         const dateMoment = momentTimeZone().tz("America/Montevideo");
-        dateMoment.locale('en');
-        // return dateMoment.format('dddd,LL,h:mm A').split(',');
+        dateMoment.locale('es');
         return dateMoment.format('x');
 
     }

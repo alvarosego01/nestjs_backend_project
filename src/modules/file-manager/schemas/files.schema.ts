@@ -1,78 +1,97 @@
-
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
 
-import * as Mongoose from "mongoose";
 import * as uniqueValidator from "mongoose-unique-validator";
 import * as castAggregation from "mongoose-cast-aggregation";
 import * as mongoosePaginate from "mongoose-paginate-v2";
 import * as aggregatePaginate from "mongoose-aggregate-paginate-v2";
 import * as mongoose_delete from "mongoose-delete";
+
 import { e_init_dateTypeModel, _init_dateTypeModel, e_blank_dateTypeModel, _blank_dateTypeModel } from "../../../common/schemas";
 
 
+
 @Schema()
-export class Users {
+class _ownerRelation {
 
     @Prop({
-        required: true,
+        required: false,
+        default: null,
+    })
+    id_owner: string;
+
+    @Prop({
+        required: false,
+        default: null,
+    })
+    schemaRelation: string;
+
+}
+const e_ownerRelation = SchemaFactory.createForClass(_ownerRelation);
+
+@Schema()
+export class FileStore {
+
+    @Prop({
+        required: false,
         default: null,
     })
     name: string;
 
     @Prop({
-        required: true,
+        required: false,
         default: null,
     })
-    lastName: string;
-
-    @Prop({
-        required: true,
-        unique: true
-    })
-    userName: string;
+    type: string;
 
     @Prop({
         required: false,
         default: null,
     })
-    nroMobile: string;
+    file: string;
 
     @Prop({
         required: false,
         default: null,
     })
-    genre: string;
+    format: string;
 
     @Prop({
-        required: true,
-        unique: true
+        required: false,
+        default: null,
     })
-    email: string;
+    folder: string;
 
     @Prop({
-        type: Mongoose.Schema.Types.ObjectId,
-        ref: "Roles",
-        required: true
+        required: false,
+        default: null,
     })
-    rol: string;
+    src: string;
 
     @Prop({
-        type: Mongoose.Schema.Types.ObjectId,
-        ref: "ProfileUser",
-        required: true
+        type: Object,
+        required: false,
+        default: null,
     })
-    profile: string;
+    details: object;
 
     @Prop({
-        required: [true, 'La contraseña es requerida']
+        type: e_ownerRelation,
+        required: false,
+        default: new _ownerRelation
     })
-    pass: string;
+    ownerRelation: _ownerRelation;
+
+    // @Prop({
+    //   type: Mongoose.Schema.Types.ObjectId,
+    //   ref: "StatusOrders",
+    //   required: false,
+    //   default: null,
+    // })
+    // statusOrder: string;
 
     @Prop({
         type: e_init_dateTypeModel,
         required: true,
-        // default: _dateService.setDate(),
         default: new _init_dateTypeModel
     })
     createdAt: _init_dateTypeModel;
@@ -80,22 +99,13 @@ export class Users {
     @Prop({
         type: e_blank_dateTypeModel,
         required: false,
-        // default: _dateService.setDate(),
         default: new _blank_dateTypeModel
     })
     updatedAt: _blank_dateTypeModel;
 
-    @Prop({
-        type: e_init_dateTypeModel,
-        required: true,
-        // default: _dateService.setDate(),
-        default: new _init_dateTypeModel
-    })
-    last_session: _init_dateTypeModel;
-
 }
 
-export const UsersSchema = SchemaFactory.createForClass(Users)
+export const FileStoreSchema = SchemaFactory.createForClass(FileStore)
     .plugin(uniqueValidator, {
         message: "El {PATH} {VALUE} ya está registrado en sistema",
     })
@@ -103,3 +113,6 @@ export const UsersSchema = SchemaFactory.createForClass(Users)
     .plugin(aggregatePaginate)
     .plugin(castAggregation)
     .plugin(mongoose_delete, { overrideMethods: 'all' });
+
+
+

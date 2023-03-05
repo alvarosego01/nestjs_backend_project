@@ -1,14 +1,16 @@
-import { Request, Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Request, Controller, Get, Post, Body, Patch, Param, Delete, UploadedFiles } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
-import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { Auth_SameIdOrAdmin } from '../../auth/decorators';
 
+
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(
+        private readonly usersService: UsersService
+    ) { }
 
     @Get()
     findAll(@Request() req: any) {
@@ -31,4 +33,6 @@ export class UsersController {
     remove(@Param('id') id: string) {
         return this.usersService.remove(id);
     }
+
+
 }

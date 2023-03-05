@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, HttpException } from "@nestjs/common";
 import { InjectModel, InjectConnection } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
@@ -6,7 +6,6 @@ import { _response_I } from "../../../common/interfaces";
 import { _argsUpdate } from "../../../common/interfaces/responseUpdate.interface";
 import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
 import { _dataPaginator, _configPaginator, _argsPagination } from "../../../common/interfaces/_responsePaginator.interface";
-import { ExeptionsHandlersService } from "../../../common/services";
 import { UpdateUserDto } from "../dto";
 import { Users } from "../schemas";
 
@@ -17,7 +16,6 @@ export class UsersService {
 
     constructor(
         @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
-        private readonly _exeptionsHandlersService: ExeptionsHandlersService,
         private readonly _processData: ProcessDataService,
         private readonly _dateProcessService: DateProcessService,
         @InjectConnection() public connection: mongoose.Connection
@@ -37,6 +35,26 @@ export class UsersService {
             limit: 12 || _configPaginator.limit,
             customLabels: _configPaginator.customLabels,
             sort: { _id: -1 },
+            select: '-pass',
+            populate: [
+                {
+                    path: 'rol',
+                    select: 'rol alias',
+                    model: 'Roles', // <- si es un array de ids se debe especificar el model
+                },
+                {
+                    path: 'profile',
+                    model: 'ProfileUser', // <- si es un array de ids se debe especificar el model
+                    select: '-user',
+                    populate: [
+                        {
+                            path: 'files.profilePic',
+                            model: 'FileStore',
+                            select: 'src'
+                        }
+                    ]
+                }
+            ]
 
         }
 
@@ -53,13 +71,14 @@ export class UsersService {
 
         }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 
         return _Response;
 
     }
+
 
     async findOne(id: string): Promise<_response_I> {
 
@@ -69,14 +88,33 @@ export class UsersService {
             findObject: {
                 _id: id,
             },
-            populate: null
+            select: '-pass',
+            populate: [
+                {
+                    path: 'rol',
+                    select: 'rol alias',
+                    model: 'Roles', // <- si es un array de ids se debe especificar el model
+                },
+                {
+                    path: 'profile',
+                    model: 'ProfileUser', // <- si es un array de ids se debe especificar el model
+                    select: '-user',
+                    populate: [
+                        {
+                            path: 'files.profilePic',
+                            model: 'FileStore',
+                            select: 'src'
+                        }
+                    ]
+                }
+            ]
         }
 
         await this._processData._findOneDB(this.UsersModel, args).then(r => {
             _Response = r;
         }, err => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 
@@ -117,7 +155,7 @@ export class UsersService {
             ]
         }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
         });
 
         return _Response;
@@ -138,7 +176,7 @@ export class UsersService {
             ]
         }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 

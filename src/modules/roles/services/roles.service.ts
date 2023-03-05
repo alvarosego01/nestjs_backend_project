@@ -1,11 +1,10 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { ProcessDataService } from "../../../common/adapters";
 import { _response_I } from "../../../common/interfaces";
 import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
 import { _dataPaginator, _configPaginator, _argsPagination } from "../../../common/interfaces/_responsePaginator.interface";
-import { ExeptionsHandlersService } from "../../../common/services";
 import { CreateRoleDto } from "../dto/create-role.dto";
 import { Roles } from "../schemas";
 
@@ -15,8 +14,6 @@ export class RolesService {
     constructor(
         @InjectModel(Roles.name) private readonly RolesModel: Model<Roles>,
         private readonly _processData: ProcessDataService,
-        // private readonly _dateProcessService: DateProcessService,
-        private readonly _exeptionsHandlersService: ExeptionsHandlersService
     ) {
 
     }
@@ -39,7 +36,7 @@ export class RolesService {
 
         }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 
@@ -69,9 +66,9 @@ export class RolesService {
 
         await this._processData._findPaginateDB(this.RolesModel, args).then(r => {
             _Response = r;
-        }, err => {
+        }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 
@@ -123,9 +120,9 @@ export class RolesService {
 
         await this._processData._findOneDB(this.RolesModel, args).then(r => {
             _Response = r;
-        }, err => {
+        }, (err: _response_I) => {
 
-            this._exeptionsHandlersService.exceptionEmitHandler(err);
+            throw new HttpException(err, err.statusCode);
 
         });
 

@@ -176,6 +176,8 @@ export class ProcessDataService {
 
                 if (error) {
 
+                    console.log('error', error);
+
                     const errors: MongooseFieldsError_I[] = Object.values(error.errors);
                     const msgModel: _responseMessage_I[] = this._mongooseHelpers.orderErrorTypes(errors);
 

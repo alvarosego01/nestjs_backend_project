@@ -5,6 +5,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { RolesModule } from "./modules/roles/roles.module";
 import { SeedModule } from "./modules/seed/seed.module";
 import { UsersModule } from "./modules/users/users.module";
+import { FileManagerModule } from './modules/file-manager/file-manager.module';
 
 @Module({
     imports: [
@@ -13,7 +14,8 @@ import { UsersModule } from "./modules/users/users.module";
         AuthModule,
         SeedModule,
         UsersModule,
-        RolesModule
+        RolesModule,
+        FileManagerModule
     ],
 })
 export class AppModule { }

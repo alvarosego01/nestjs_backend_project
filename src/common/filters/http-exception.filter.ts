@@ -20,15 +20,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
         const status = exception.getStatus();
         const path: string = request.url;
 
-        const error = (exception.cause?.stack) ? exception.cause.stack : exception.cause || null;
+        let error: any = null;
 
-        // console.log('exception.cause', exception);
+        console.log('exception.cause', exception);
+
+        if (exception.cause?.stack) {
+            error = exception.cause.stack;
+        } else if (exception.cause) {
+            error = exception.cause;
+        }
 
         const message: _responseMessage_I[] = exception['response'].message;
 
         if (error != null) {
             const logger = new Logger(`Exception filter - Status: ${status} - Path: ${path}`);
             logger.error(exception.cause);
+        }else if( exception['response'].message ){
+            const logger = new Logger(`Exception filter - Status: ${status} - Path: ${path}`);
+            logger.error(exception['response'].message);
         }
 
         const _response: _response_I = {
@@ -42,7 +51,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         response
             .status(status)
-            .json(_response)
+            .json(_response);
+
     }
 
 

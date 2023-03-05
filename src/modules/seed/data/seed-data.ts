@@ -31,7 +31,7 @@ export const seed_initialData: SeedData = {
             lastName: "Segovia",
             userName: "alvarosego01",
             email: "admin@gmail.com",
-            pass: "A-12345",
+            pass: "Pb_12345",
             rol: "ADMIN_ROLE"
         },
         {
@@ -39,7 +39,7 @@ export const seed_initialData: SeedData = {
             lastName: "Betancourt",
             userName: "lore001",
             email: "artist01@gmail.com",
-            pass: "A-12345",
+            pass: "Pb_12345",
             rol: "ARTIST_ROLE"
         },
         {
@@ -47,7 +47,7 @@ export const seed_initialData: SeedData = {
             lastName: "Atkinson",
             userName: "row001",
             email: "contratist01@gmail.com",
-            pass: "A-12345",
+            pass: "Pb_12345",
             rol: "CONTRATIST_ROLE"
         }
     ],
