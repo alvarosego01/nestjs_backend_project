@@ -16,42 +16,42 @@ export class FileManagerController {
     constructor(private readonly fileManagerService: FileManagerService) { }
 
     //   @UseGuards(AuthGuard('jwt'))
-    @Post('/avatar/:id')
-    @ApiFiles(
-        'profilePic',
-        true,
-        1,
-        {
-            fileFilter: imageFileFilter,
-            storage: diskStorage({
-                destination: (req, file, cb) => {
-                    // let p = `./files/users/${req.params['id']}/credentials`;
-                    //   let dest = './files/users/' + req.params[ 'id' ] + '/profile/bio';
-                    let dest = './files/images/';
+    // @Post('/avatar/:id')
+    // @ApiFiles(
+    //     'profilePic',
+    //     true,
+    //     1,
+    //     {
+    //         fileFilter: imageFileFilter,
+    //         storage: diskStorage({
+    //             destination: (req, file, cb) => {
+    //                 // let p = `./files/users/${req.params['id']}/credentials`;
+    //                 //   let dest = './files/users/' + req.params[ 'id' ] + '/profile/bio';
+    //                 let dest = './files/images/';
 
-                    if (!fs.existsSync(dest)) {
-                        fs.mkdirSync(dest, {
-                            recursive: true
-                        });
-                    }
+    //                 if (!fs.existsSync(dest)) {
+    //                     fs.mkdirSync(dest, {
+    //                         recursive: true
+    //                     });
+    //                 }
 
-                    cb(null, dest);
+    //                 cb(null, dest);
 
-                    // return dir;
-                },
-                filename: editFileName,
-            })
-        }
-    )
-    async uploadAvatar(@UploadedFiles(ParseFile) file: Express.Multer.File[], @Param('id') id: string) {
+    //                 // return dir;
+    //             },
+    //             filename: editFileName,
+    //         })
+    //     }
+    // )
+    // async uploadAvatar(@UploadedFiles(ParseFile) file: Express.Multer.File[], @Param('id') id: string) {
 
-        console.log('file', file);
+    //     console.log('file', file);
 
-        return file;
-        // let _Response: responseInterface = await this._profileService.setProfilePic(id, file);
+    //     return file;
+    //     // let _Response: responseInterface = await this._profileService.setProfilePic(id, file);
 
-        // return res.status(_Response.statusCode).json(_Response);
+    //     // return res.status(_Response.statusCode).json(_Response);
 
-    }
+    // }
 
 }

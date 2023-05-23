@@ -28,3 +28,15 @@ export interface OwnerRelation_I {
     schemaRelation: string;
     _id?: string;
 }
+
+
+export interface fileFormatBody_I {
+    fieldname: string;
+    originalname: string;
+    encoding: string;
+    mimetype: string;
+    destination: string;
+    filename: string;
+    path: string;
+    size: number;
+}

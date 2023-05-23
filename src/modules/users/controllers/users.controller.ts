@@ -2,7 +2,9 @@ import { Request, Controller, Get, Post, Body, Patch, Param, Delete, UploadedFil
 import { UsersService } from '../services/users.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Auth_SameIdOrAdmin } from '../../auth/decorators';
+import { Auth, Auth_SameIdOrAdmin } from '../../auth/decorators';
+import { CreateUserDto } from '../dto';
+import { RoleType } from '../../roles/enum/roletype.enum';
 
 
 @ApiTags('Users')
@@ -13,11 +15,13 @@ export class UsersController {
     ) { }
 
     @Get()
+    @Auth(RoleType.ADMIN_ROLE)
     findAll(@Request() req: any) {
         return this.usersService.findAll(req.page);
     }
 
     @Get(':id')
+    @Auth_SameIdOrAdmin()
     findOne(@Param('id') id: string) {
         return this.usersService.findOne(id);
     }
@@ -33,6 +37,7 @@ export class UsersController {
     remove(@Param('id') id: string) {
         return this.usersService.remove(id);
     }
+
 
 
 }

@@ -1,7 +1,10 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { CommonModule } from "../../common/common.module";
+import { AuthModule } from "../auth/auth.module";
+import { AuthService } from "../auth/services/auth.service";
 import { FileManagerModule } from "../file-manager/file-manager.module";
+import { RolesModule } from "../roles/roles.module";
 import { ProfileController, UsersController } from "./controllers";
 import { Users, UsersSchema } from "./schemas";
 import { ProfileUser, ProfileUserSchema } from "./schemas/profile.schema";
@@ -16,27 +19,28 @@ export const _USERSCHEMA = MongooseModule.forFeature([
 ]);
 
 export const _PROFILESCHEMA = MongooseModule.forFeature([
-  {
-    name: ProfileUser.name,
-    schema: ProfileUserSchema,
-  },
+    {
+        name: ProfileUser.name,
+        schema: ProfileUserSchema,
+    },
 ]);
 
 @Module({
     controllers: [
         UsersController,
         ProfileController
-        ],
+    ],
     providers: [
         UsersService,
-        ProfileService
+        ProfileService,
+
     ],
     imports: [
         _USERSCHEMA,
         _PROFILESCHEMA,
         CommonModule,
-        FileManagerModule
-        // AuthModule
+        FileManagerModule,
+        RolesModule
     ],
     exports: [
         MongooseModule,
@@ -44,4 +48,6 @@ export const _PROFILESCHEMA = MongooseModule.forFeature([
         ProfileService
     ]
 })
-export class UsersModule { }
+export class UsersModule {
+
+}

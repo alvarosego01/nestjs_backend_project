@@ -41,8 +41,8 @@ async function bootstrap() {
     );
 
     const config = new DocumentBuilder()
-        .setTitle('Wam Backend Restful Api')
-        .setDescription('Wam backend endpoints')
+        .setTitle('BP Backend Restful Api')
+        .setDescription('BP backend endpoints')
         .setVersion('1.0')
         .build();
     const document = SwaggerModule.createDocument(app, config);
@@ -54,3 +54,7 @@ async function bootstrap() {
 
 }
 bootstrap();
+
+
+console.log(process.cwd());
+

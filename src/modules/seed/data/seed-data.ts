@@ -30,43 +30,45 @@ export const seed_initialData: SeedData = {
             name: "Alvaro",
             lastName: "Segovia",
             userName: "alvarosego01",
-            email: "admin@gmail.com",
+            email: "alvarosego01@gmail.com",
             pass: "Pb_12345",
             rol: "ADMIN_ROLE"
         },
         {
-            name: "Lorena",
+            name: "Luicelis",
             lastName: "Betancourt",
-            userName: "lore001",
-            email: "artist01@gmail.com",
+            userName: "lui27",
+            email: "luicelis27@gmail.com",
             pass: "Pb_12345",
-            rol: "ARTIST_ROLE"
+            rol: "ADMIN_ROLE"
         },
         {
-            name: "Rowan",
-            lastName: "Atkinson",
-            userName: "row001",
-            email: "contratist01@gmail.com",
+            name: "Agente",
+            lastName: "Agente",
+            userName: "agent01",
+            email: "agent01@gmail.com",
             pass: "Pb_12345",
-            rol: "CONTRATIST_ROLE"
+            rol: "AGENT_ROLE"
         }
     ],
     roles: [
+
         {
-            description: "Artist role to system",
-            alias: "Artista",
-            rol: "ARTIST_ROLE"
+            description: "Usuario por defecto en sistema",
+            alias: "Usuario",
+            rol: "DEFAULT_ROLE"
         },
         {
-            description: "Admin role to system",
+            description: "Agente de ventas en sistema",
+            alias: "Agente",
+            rol: "AGENT_ROLE"
+        },
+        {
+            description: "Administrador en sistema",
             alias: "Administrador",
             rol: "ADMIN_ROLE"
         },
-        {
-            description: "Contratist role to system",
-            alias: "Contratista",
-            rol: "CONTRATIST_ROLE"
-        }
+
     ]
 
 

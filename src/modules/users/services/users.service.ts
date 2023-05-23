@@ -1,4 +1,4 @@
-import { Injectable, HttpException } from "@nestjs/common";
+import { Injectable, HttpException, Inject } from "@nestjs/common";
 import { InjectModel, InjectConnection } from "@nestjs/mongoose";
 import mongoose, { Model } from "mongoose";
 import { ProcessDataService, DateProcessService } from "../../../common/adapters";
@@ -6,22 +6,135 @@ import { _response_I } from "../../../common/interfaces";
 import { _argsUpdate } from "../../../common/interfaces/responseUpdate.interface";
 import { _argsFind } from "../../../common/interfaces/_responseFindParameters.interface";
 import { _dataPaginator, _configPaginator, _argsPagination } from "../../../common/interfaces/_responsePaginator.interface";
-import { UpdateUserDto } from "../dto";
+import { AuthService } from "../../auth/services/auth.service";
+import { RolesService } from "../../roles/services/roles.service";
+import { UpdateUserDto, CreateUserDto } from "../dto";
 import { Users } from "../schemas";
+import { ProfileUser } from "../schemas/profile.schema";
 
+import * as bcrypt from "bcrypt";
 
 
 @Injectable()
 export class UsersService {
 
     constructor(
-        @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
+         @InjectModel(Users.name) private UsersModel: Model<Users>,
+        @InjectModel(ProfileUser.name) private ProfileUserModel: Model<ProfileUser>,
         private readonly _processData: ProcessDataService,
         private readonly _dateProcessService: DateProcessService,
+        // private readonly _authService: AuthService,
+        private readonly _roleService: RolesService,
         @InjectConnection() public connection: mongoose.Connection
     ) {
 
+    }
 
+    async createAgent(CreateUserDto: CreateUserDto){
+
+          let _Response: _response_I;
+
+          CreateUserDto.rol = 'AGENT_ROLE';
+
+            await this.create(CreateUserDto).then(r => {
+                _Response = r;
+            })
+
+        return _Response
+
+    }
+
+
+      async create(CreateUserDto: CreateUserDto): Promise<_response_I> {
+
+        const {
+            pass,
+            rol
+        } = CreateUserDto;
+
+        const user = new this.UsersModel(CreateUserDto);
+
+        user.pass = bcrypt.hashSync(pass, 10);
+
+        let _Response: _response_I;
+
+        let rl: string = null;
+
+        const transactionSession = await this.connection.startSession();
+        transactionSession.startTransaction();
+
+        await this._roleService.getByRole(rol).then((r: _response_I) => {
+
+            rl = r.data._id;
+            user.rol = rl;
+
+        }).catch((err: _response_I) => {
+
+            _Response = err;
+
+        });
+
+        let profile = new this.ProfileUserModel({
+            user: user._id
+        });
+
+        user.profile = String(profile._id);
+
+        await this._processData._saveDB(profile, transactionSession).then(async (r: _response_I) => {
+
+        }, async (err: _response_I) => {
+
+            _Response = err;
+            _Response.message = [
+                {
+                    message: 'No se pudo crear el perfil de usuario',
+                    type: 'global'
+                }
+            ];
+
+        });
+
+
+        await this._processData._saveDB(user, transactionSession).then(async (r: _response_I) => {
+
+            _Response = r;
+            _Response.message = [
+                {
+                    message: `Usuario registrado exitosamente`,
+                    type: 'global'
+                }
+            ]
+
+        }, (err: _response_I) => {
+            _Response = err;
+              _Response.message = [
+                {
+                    message: `No se pudo registrar el usuario`,
+                    type: 'global'
+                }
+            ]
+
+        });
+
+        if (_Response.ok == true) {
+
+            await transactionSession.commitTransaction()
+            await transactionSession.endSession();
+
+        } else {
+
+            await transactionSession.endSession();
+
+            throw new HttpException({
+               status: _Response.statusCode,
+               error: _Response.message,
+             }, _Response.statusCode, {
+               cause: _Response.err
+             });
+
+        }
+
+        return _Response
 
     }
 

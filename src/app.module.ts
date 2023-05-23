@@ -7,6 +7,8 @@ import { SeedModule } from "./modules/seed/seed.module";
 import { UsersModule } from "./modules/users/users.module";
 import { FileManagerModule } from './modules/file-manager/file-manager.module';
 
+
+
 @Module({
     imports: [
         ConfigProjectModule,
@@ -15,7 +17,7 @@ import { FileManagerModule } from './modules/file-manager/file-manager.module';
         SeedModule,
         UsersModule,
         RolesModule,
-        FileManagerModule
+        FileManagerModule,
     ],
 })
 export class AppModule { }

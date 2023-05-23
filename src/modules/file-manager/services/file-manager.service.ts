@@ -1,15 +1,17 @@
 import { HttpException, Injectable } from "@nestjs/common";
-import path from "path";
 import { _argsFind, _response_I } from "../../../common/interfaces";
-import { CreateFileManagerDto } from "../dto/create-file-manager.dto";
-import { UpdateFileManagerDto } from "../dto/update-file-manager.dto";
 import { imageFormat_I, OwnerRelation_I } from "../interfaces/index";
-import * as fs from 'fs';
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { FileStore } from "../schemas/files.schema";
 import { DateProcessService, ProcessDataService } from "../../../common/adapters";
 import { _argsUpdate } from "../../../common/interfaces/responseUpdate.interface";
+import { fileFormatBody_I } from "../interfaces/fileTemplate.dto";
+
+
+import * as fs from 'fs';
+import path from "path";
+
 
 
 
@@ -52,12 +54,7 @@ export class FileManagerService {
 
         return _Response;
 
-
     }
-
-
-
-
 
     async saveFileStore(idStore: string, files: Express.Multer.File[], ownerRelation: OwnerRelation_I): Promise<_response_I> {
 
@@ -91,7 +88,7 @@ export class FileManagerService {
 
         if (!aux_storeFile) {
 
-            let fileStore = new this.FileStoreModel(...newElements );
+            let fileStore = new this.FileStoreModel(...newElements);
 
             await this._processData._saveDB(fileStore).then((r: _response_I) => {
 
@@ -109,7 +106,7 @@ export class FileManagerService {
 
             });
 
-        }else{
+        } else {
 
             await this.removeFile(
                 aux_storeFile.src
@@ -208,14 +205,14 @@ export class FileManagerService {
     //   ],
 
     // async setFileElements(files: any, type: string, ownerRelation: OwnerRelation_I ) {
-    async setFileElements(files: any, ownerRelation: OwnerRelation_I ) {
+    async setFileElements(files: any, ownerRelation: OwnerRelation_I) {
 
         return new Promise(async (resolve, reject) => {
 
             let elements: imageFormat_I[] = [];
 
             try {
-                if (Array.isArray(files) && files.length > 0 ) {
+                if (Array.isArray(files) && files.length > 0) {
 
                     await files.forEach((element: any) => {
 
@@ -238,7 +235,7 @@ export class FileManagerService {
 
                 }
 
-                if (this.isAnyObject(files) && Object.keys(files).length > 0 ) {
+                if (this.isAnyObject(files) && Object.keys(files).length > 0) {
 
                     await Object.keys(files).forEach((value, key) => {
 
@@ -453,4 +450,131 @@ export class FileManagerService {
 
     }
 
+
+    async getFilesInDirectory(path) {
+        // lee todos los elementos del directorio
+        const files = fs.readdirSync(path);
+
+        // filtra solo los archivos, y no los subdirectorios
+        let filteredFiles = files.filter(function (file) {
+            return fs.statSync(path + '/' + file).isFile();
+        });
+
+        filteredFiles = await filteredFiles.sort(function (a, b) {
+            // Extraer los números de las cadenas de texto usando expresiones regulares
+            var numeroA = parseInt(a.match(/\d+/)[0]);
+            var numeroB = parseInt(b.match(/\d+/)[0]);
+
+            // Comparar los números en orden numérico ascendente
+            return numeroA - numeroB;
+        });
+        // devuelve el array con los nombres de los archivos
+        return filteredFiles;
+    }
+
+
+    path_existVerify(directoryPath: string) {
+
+        return new Promise(async (resolve, reject) => {
+
+            try {
+                // let resp_exist = await fs.statSync(directoryPath)
+
+                await fs.exists(directoryPath, existe => {
+
+                    if (!existe) {
+                        // path = './assets/no-img.jpg';
+                        reject(false);
+
+                    }
+
+                    resolve(true);
+
+                });
+
+                // resolve(true)
+
+            } catch (error) {
+
+                console.log(error);
+
+                let _Response: _response_I = {
+                    ok: false,
+                    statusCode: 404,
+                    err: error,
+                    message: [
+                        {
+                            message: 'Error al procesar elementos',
+                            type: 'global'
+                        }
+                    ]
+                }
+
+                throw new HttpException({
+                    status: _Response.statusCode,
+                    error: _Response.message,
+                }, _Response.statusCode, {
+                    cause: _Response.err
+                });
+
+
+                reject(false);
+                // reject(false)
+
+            }
+
+        })
+
+    }
+
+
+    async get_fileFormatBody(file: Uint8Array, fileName: string, path: string, destination: string): Promise<fileFormatBody_I> {
+
+        // fieldname: 'profilePic',
+        // originalname: 'Group 9377.png',
+        // encoding: '7bit',
+        // mimetype: 'image/png',
+        // destination: './files/images/',
+        // filename: 'Group 9377-102b4472c7fe3dab7.png',
+        // path: 'files\\images\\Group 9377-102b4472c7fe3dab7.png',
+        // size: 876492
+
+        return new Promise((resolve, reject) => {
+
+
+            let fileBody: fileFormatBody_I = {
+                fieldname: 'bingoCarton',
+                originalname: fileName,
+                encoding: '7bit',
+                mimetype: 'application/pdf',
+                // destination: destination,
+                // path: path,
+                destination: './' + destination.replace(process.cwd() + '/', '') + '/',
+                path: path.replace(process.cwd() + '/', ''),
+                filename: fileName,
+                size: file.length
+            }
+
+
+            resolve(fileBody);
+
+        })
+
+    }
+
+    async saveDirectFile(file: Uint8Array, dest: string, pathName: string) {
+
+        let _dest: string = dest;
+
+        if (!fs.existsSync(_dest)) {
+            fs.mkdirSync(_dest, { recursive: true });
+        }
+
+        // Guardar el archivo en la ruta de destino
+        fs.writeFileSync(pathName, file);
+
+    }
+
+
 }
+

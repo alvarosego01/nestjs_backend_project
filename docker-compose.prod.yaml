@@ -35,14 +35,14 @@
 version: '3'
 
 services:
-  wam_back_app:
+  back_app:
     depends_on:
-      - db_wam
+      - db_back
     build:
       context: .
       dockerfile: Dockerfile
-    image: wam_backend_docker
-    container_name: wam_back_app
+    image: backend_docker
+    container_name: back_app
     restart: always # reiniciar el contenedor si se detiene
     ports:
       - "${PORT}:${PORT}"
@@ -59,13 +59,13 @@ services:
       EMAILINFO: ${EMAILINFO}
     # volumes:
     #   - ./:/var/www/pokedex
-  db_wam:
+  db_back:
     image: mongo:6.0.4
-    container_name: mongo-wam
+    container_name: mongo-back
     restart: always
     ports:
       - 27017:27017
     environment:
-      MONGODB_DATABASE: wam_db
+      MONGODB_DATABASE: back_db
     volumes:
       - ./mongo:/data/db

@@ -128,7 +128,7 @@ export class CreateUserDto {
 
     @ApiProperty({
         description: 'Role tag of user',
-        example: 'DEFAULT_ROLE | ADMIN_ROLE | ARTIST_ROLE | CONTRATIST_ROLE',
+        example: 'DEFAULT_ROLE | ADMIN_ROLE | AGENT_ROLE',
         nullable: false,
     })
     @IsNotEmpty({

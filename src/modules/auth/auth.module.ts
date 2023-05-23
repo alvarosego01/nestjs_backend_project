@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
@@ -11,11 +11,13 @@ import { AuthWsModule } from "./gateways/auth-ws.module";
 import { AuthService } from "./services/auth.service";
 import { JwtStrategy } from "./strategies/jwt.strategy";
 
+
 @Module({
     controllers: [AuthController],
     providers: [
         AuthService,
-        JwtStrategy
+        JwtStrategy,
+
     ],
     imports: [
         ConfigModule,
@@ -34,12 +36,11 @@ import { JwtStrategy } from "./strategies/jwt.strategy";
                 return {
                     secret: configService.get(_Configuration_Keys.JWT_SECRET),
                     signOptions: {
-                        expiresIn: '72h'
+                        expiresIn: '7D'
                     }
                 }
             }
         }),
-        UsersModule,
         RolesModule,
         UsersModule,
         CommonModule,

@@ -3,12 +3,12 @@
 version: '3'
 
 services:
-  db_wam:
+  db_back:
     image: mongo:6.0.4
     restart: always
     ports:
       - 37017:27017
     environment:
-      MONGODB_DATABASE: wam_db
+      MONGODB_DATABASE: back_db
     volumes:
       - ./mongo:/data/db

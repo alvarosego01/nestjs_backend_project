@@ -46,12 +46,10 @@ export class ProfileController {
     )
     async uploadAvatar(@UploadedFiles(ParseFile) file: Express.Multer.File[], @Param('id') id: string) {
 
-        // console.log('file', file);
+        console.log('file', file);
 
-        // return file;
         return this._profileService.setProfilePic(id, file);
 
-        // return res.status(_Response.statusCode).json(_Response);
 
     }
 

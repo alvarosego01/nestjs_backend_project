@@ -11,15 +11,11 @@ import { e_init_dateTypeModel, _init_dateTypeModel, e_blank_dateTypeModel, _blan
 
 import { RoleType } from "../enum/roletype.enum";
 
-
-
-
 const rolesEnum = Object.values(RoleType);
 const roles = {
     values: rolesEnum,
     message: 'El rol {VALUE} no esta permitido'
 }; //array de rolesEnum
-
 
 
 @Schema()

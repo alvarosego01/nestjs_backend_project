@@ -71,7 +71,7 @@ export class ProfileService {
 
             aux_profile.files.profilePic = resp.data._id;
 
-            if(resp.statusCode != 200){
+            if(resp.statusCode != 200 && resp.statusCode != 201){
                  throw new HttpException({
                 status: _Response.statusCode,
                     error: _Response.message,
